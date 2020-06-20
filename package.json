@@ -8,6 +8,10 @@
     "styled-components"
   ],
   "main": "theme.macro.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Joe-Edwards/theme.macro.git"
+  },
   "scripts": {
     "test": "jest"
   },
