@@ -3,36 +3,43 @@ const { createMacro, MacroError } = require('babel-plugin-macros');
 const THEME = 'theme';
 const PROPS = 'props';
 
-const findTemplateExpression = (path) => {
+// Record of all template paths that have been transformed, and the props identifier used
+const transformedTemplates = [];
+
+const findTemplatePath = (path) => {
   if (!path.parentPath) {
     return null;
-    //throw new MacroError('The theme macro may only be used within a template expression');
   }
   if (path.parentPath.isTemplateLiteral()) {
     return path;
   }
-  return findTemplateExpression(path.parentPath);
+  return findTemplatePath(path.parentPath);
 }
 
 const handleReference = (path, { types: t }) => {
-  // Generate a non-conflicting identifier for props
-  const props = path.scope.generateUidIdentifier(PROPS);
+  const templatePath = findTemplatePath(path);
 
-  // Get the path for the templated expression
-  const templateExpression = findTemplateExpression(path);
-
-  if (!templateExpression) {
+  if (!templatePath) {
     throw new MacroError(`The theme macro at line ${path.node.loc && path.node.loc.start.line} is not used within a template expression`);
   }
 
-  // Replace the macro identifier with `props.theme`
-  path.replaceWith(t.memberExpression(props, t.identifier(THEME)));
+  let template = transformedTemplates.find(template => template.path === templatePath);
 
-  // Construct an arrow function from props
-  const arrowExpression = t.arrowFunctionExpression([props], templateExpression.node);
+  if (!template) {
+    // Generate a new non-conflicting identifier for props
+    template = { path: templatePath, props: path.scope.generateUidIdentifier(PROPS) };
 
-  // Replace the old template expression with the new one
-  templateExpression.replaceWith(arrowExpression);
+    // Construct an arrow function from props
+    const arrowExpression = t.arrowFunctionExpression([template.props], templatePath.node);
+
+    // Replace the old template expression with the new one
+    templatePath.replaceWith(arrowExpression);
+
+    transformedTemplates.push(template);
+  }
+
+  // Replace the current macro identifier with `props.theme`
+  path.replaceWith(t.memberExpression(template.props, t.identifier(THEME)));
 };
 
 module.exports = createMacro(({ references, babel }) => {

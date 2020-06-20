@@ -16,7 +16,7 @@ import theme from '../theme.macro';
 \`\${(_props2) => _props2.theme.foo.bar}\` // Nested member access
 \`\${(_props3) => _props3.theme.foo[8] + 7}\` // Complex expression
 \`\${(_props4) => (props) => _props4.theme.foo + props.bar}\` // Expression with props
-\`\${(_props6) => (_props5) => _props5.theme.foo + _props6.theme.bar}\`; // Expression with multiple references
+\`\${(_props5) => _props5.theme.foo + _props5.theme.bar}\`; // Expression with multiple references
 
 
 `;
