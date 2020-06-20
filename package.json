@@ -1,0 +1,22 @@
+{
+  "name": "theme-macro",
+  "version": "1.0.0",
+  "description": "Macro for generating theme expressions for styled-components",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "babel-plugin-macros": "^2.8.0"
+  },
+  "peerDependencies": {
+    "@types/styled-components": ">=4.0.0"
+  },
+  "devDependencies": {
+    "@types/styled-components": "^5.1.0",
+    "babel-plugin-tester": "^9.2.0",
+    "jest": "^26.0.1"
+  }
+}
