@@ -73,13 +73,25 @@ exports[`Theme Macro Props: Props 1`] = `
 
 import theme from '../../theme.macro';
 
+const computed = 'theme';
+
+css\`\${() => theme.foo}\`
 css\`\${props => theme.foo + props.bar}\`
 css\`\${function (props) { theme.foo + props.bar }}\`
 css\`\${({ bar }) => theme.foo + bar}\`
-css\`\${() => theme.foo}\`
+css\`\${({ bar: { baz } }) => theme.foo + baz}\`
+css\`\${({ '-bar-': bar }) => theme.foo + bar}\`
+css\`\${({ bar, theme: t }) => theme.foo + bar + t.baz}\`
+css\`\${({ bar, 'theme': t }) => theme.foo + bar + t.baz}\`
+css\`\${({ bar, ...rest }) => theme.foo + bar + rest.baz}\`
+css\`\${({ [computed]: bar }) => theme.foo + bar}\`
 
       ↓ ↓ ↓ ↓ ↓ ↓
 
+const computed = "theme";
+css\`
+  \${(_props) => _props.theme.foo}
+\`;
 css\`
   \${(props) => props.theme.foo + props.bar}
 \`;
@@ -89,10 +101,25 @@ css\`
   }}
 \`;
 css\`
-  \${(_props) => ({ bar }) => _props.theme.foo + bar}
+  \${({ bar, theme: _theme }) => _theme.foo + bar}
 \`;
 css\`
-  \${(_props2) => () => _props2.theme.foo}
+  \${({ bar: { baz }, theme: _theme2 }) => _theme2.foo + baz}
+\`;
+css\`
+  \${({ "-bar-": bar, theme: _theme3 }) => _theme3.foo + bar}
+\`;
+css\`
+  \${({ bar, theme: t }) => t.foo + bar + t.baz}
+\`;
+css\`
+  \${({ bar, theme: t, theme: _theme4 }) => _theme4.foo + bar + t.baz}
+\`;
+css\`
+  \${(_props2) => ({ bar, ...rest }) => _props2.theme.foo + bar + rest.baz}
+\`;
+css\`
+  \${({ [computed]: bar, theme: _theme5 }) => _theme5.foo + bar}
 \`;
 
 

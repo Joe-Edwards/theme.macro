@@ -13,33 +13,86 @@ const findTemplateExpression = (path) => {
   return findTemplateExpression(path.parentPath);
 }
 
-const handleReference = (path, { types: t }) => {
+const getThemeExpression = (path, templateExpression, t) => {
+
+  // If the template is already a function then we may be able to reuse it rather than wrapping
+  if (templateExpression.isFunction()) {
+    const propsParam = templateExpression.get('params.0');
+
+    // No-arg function
+    if (!propsParam) {
+      // Generate a new non-conflicting identifier for props
+      const propsExpression = path.scope.generateUidIdentifier(PROPS);
+
+      // Add as a new argument
+      templateExpression.node.params.push(propsExpression);
+
+      // Theme accessed as `props.theme`
+      return t.memberExpression(propsExpression, t.identifier(THEME));
+    }
+
+    // Function with a simple identifer for props
+    if (propsParam.isIdentifier()) {
+      // Theme accessed as `props.theme`
+      return t.memberExpression(propsParam.node, t.identifier(THEME));
+    }
+
+    // Function with destructured props
+    if (propsParam.isObjectPattern()) {
+      // Find theme property destructured as an identifier
+      const themeProperty = propsParam.get('properties').find(p =>
+        p.isObjectProperty()
+        && p.get('key').isIdentifier() && p.get('key').node.name === THEME
+        && p.get('value').isIdentifier()
+      );
+
+      // Theme is already destructured with an identifier - reuse it
+      if (themeProperty) {
+        return themeProperty.get('value');
+      }
+
+      // Props has no rest element - safe to add a new identifier for theme
+      if (!propsParam.get('properties').some(p => p.isRestElement())) {
+        // Generate a new non-conflicting identifier for theme
+        const themeIdentifier = path.scope.generateUidIdentifier(THEME);
+
+        // Add as new property
+        propsParam.node.properties.push(t.objectProperty(t.identifier(THEME), themeIdentifier));
+
+        // Theme accessed using new identifier
+        return themeIdentifier;
+      }
+    }
+  }
+
+  // No reusable function: wrap the template expression in a new arrow function
+
+  // Generate a new non-conflicting identifier for props
+  const propsExpression = path.scope.generateUidIdentifier(PROPS);
+
+  // Construct an arrow function from props
+  const arrowExpression = t.arrowFunctionExpression([propsExpression], templateExpression.node);
+
+  // Replace the old template expression with the new one
+  templateExpression.replaceWith(arrowExpression);
+
+  // Theme accessed as `props.theme`
+  return t.memberExpression(propsExpression, t.identifier(THEME));
+}
+
+const handleReference = (path, t) => {
   const templateExpression = findTemplateExpression(path);
 
   if (!templateExpression) {
     throw new MacroError(`The theme macro at line ${path.node.loc && path.node.loc.start.line} is not used within a tagged template literal`);
   }
 
-  let props;
+  const themeExpression = getThemeExpression(path, templateExpression, t);
 
-  // Identify template expressions already in the correct form
-  if (templateExpression.isFunction() && templateExpression.get('params.0') && templateExpression.get('params.0').isIdentifier()) {
-    props = templateExpression.get('params.0').node;
-  } else {
-    // Generate a new non-conflicting identifier for props
-    props = path.scope.generateUidIdentifier(PROPS);
-
-    // Construct an arrow function from props
-    const arrowExpression = t.arrowFunctionExpression([props], templateExpression.node);
-
-    // Replace the old template expression with the new one
-    templateExpression.replaceWith(arrowExpression);
-  }
-
-  // Replace the current macro identifier with `props.theme`
-  path.replaceWith(t.memberExpression(props, t.identifier(THEME)));
+  // Replace the current macro identifier with the theme expression
+  path.replaceWith(themeExpression);
 };
 
-module.exports = createMacro(({ references, babel }) => {
-  references.default.forEach((path) => handleReference(path, babel));
+module.exports = createMacro(({ references, babel: { types: t } }) => {
+  references.default.forEach((path) => handleReference(path, t));
 });
