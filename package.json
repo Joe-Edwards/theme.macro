@@ -1,12 +1,17 @@
 {
-  "name": "theme-macro",
+  "name": "theme.macro",
   "version": "1.0.0",
-  "description": "Macro for generating theme expressions for styled-components",
-  "main": "index.js",
+  "description": "Babel plugin macro for generating theme expressions for styled-components",
+  "keywords": [
+    "babel",
+    "babel-plugin-macros",
+    "styled-components"
+  ],
+  "main": "theme.macro.js",
   "scripts": {
     "test": "jest"
   },
-  "author": "",
+  "author": "Joe Edwards",
   "license": "ISC",
   "dependencies": {
     "babel-plugin-macros": "^2.8.0"

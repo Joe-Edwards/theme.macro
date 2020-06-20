@@ -1,0 +1,111 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`macros 1. macros: 1. macros 1`] = `
+
+import theme from '../theme.macro';
+
+// Simple examples
+
+css\`\${theme.foo}\`
+css\`\${theme.foo.bar}\`
+css\`\${theme.foo[8] + 7}\`
+css\`\${bar(theme.foo)}\`
+css\`\${theme.foo + theme.bar}\`
+
+      ↓ ↓ ↓ ↓ ↓ ↓
+
+// Simple examples
+css\`
+  \${(_props) => _props.theme.foo}
+\`;
+css\`
+  \${(_props2) => _props2.theme.foo.bar}
+\`;
+css\`
+  \${(_props3) => _props3.theme.foo[8] + 7}
+\`;
+css\`
+  \${(_props4) => bar(_props4.theme.foo)}
+\`;
+css\`
+  \${(_props5) => _props5.theme.foo + _props5.theme.bar}
+\`;
+
+
+`;
+
+exports[`macros 2. macros: 2. macros 1`] = `
+
+import theme from '../theme.macro';
+
+// Examples with props
+
+css\`\${props => theme.foo + props.bar}\`
+css\`\${function (props) { theme.foo + props.bar }}\`
+css\`\${({ bar }) => theme.foo + bar}\`
+css\`\${() => theme.foo}\`
+
+      ↓ ↓ ↓ ↓ ↓ ↓
+
+// Examples with props
+css\`
+  \${(props) => props.theme.foo + props.bar}
+\`;
+css\`
+  \${function (props) {
+    props.theme.foo + props.bar;
+  }}
+\`;
+css\`
+  \${(_props) => ({ bar }) => _props.theme.foo + bar}
+\`;
+css\`
+  \${(_props2) => () => _props2.theme.foo}
+\`;
+
+
+`;
+
+exports[`macros 3. macros: 3. macros 1`] = `
+
+import theme from '../theme.macro';
+
+// Examples with nesting
+
+css\`\${props => props.foo && css\`\${theme.bar}\`}\`
+css\`\${props => props.foo ? css\`\${theme.bar}\` : css\`\${theme.baz}\`}\`
+css\`\${theme.foo ? css\`\${theme.bar}\` : css\`\${theme.baz}\`}\`
+
+      ↓ ↓ ↓ ↓ ↓ ↓
+
+// Examples with nesting
+css\`
+  \${(props) =>
+    props.foo &&
+    css\`
+      \${(_props) => _props.theme.bar}
+    \`}
+\`;
+css\`
+  \${(props) =>
+    props.foo
+      ? css\`
+          \${(_props2) => _props2.theme.bar}
+        \`
+      : css\`
+          \${(_props3) => _props3.theme.baz}
+        \`}
+\`;
+css\`
+  \${(_props4) =>
+    _props4.theme.foo
+      ? css\`
+          \${(_props5) => _props5.theme.bar}
+        \`
+      : css\`
+          \${(_props6) => _props6.theme.baz}
+        \`}
+\`;
+
+
+`;
