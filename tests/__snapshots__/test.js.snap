@@ -1,84 +1,39 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`macros 1. macros: 1. macros 1`] = `
+exports[`Theme Macro Different usages: Different usages 1`] = `
 
-import theme from '../theme.macro';
-
-// Simple examples
+import theme from '../../theme.macro';
 
 css\`\${theme.foo}\`
-css\`\${theme.foo.bar}\`
-css\`\${theme.foo[8] + 7}\`
-css\`\${bar(theme.foo)}\`
-css\`\${theme.foo + theme.bar}\`
+styled.div\`\${theme.foo}\`
+styled(Foo)\`\${theme.foo}\`
 
       ↓ ↓ ↓ ↓ ↓ ↓
 
-// Simple examples
 css\`
   \${(_props) => _props.theme.foo}
 \`;
-css\`
-  \${(_props2) => _props2.theme.foo.bar}
+styled.div\`
+  \${(_props2) => _props2.theme.foo}
 \`;
-css\`
-  \${(_props3) => _props3.theme.foo[8] + 7}
-\`;
-css\`
-  \${(_props4) => bar(_props4.theme.foo)}
-\`;
-css\`
-  \${(_props5) => _props5.theme.foo + _props5.theme.bar}
+styled(Foo)\`
+  \${(_props3) => _props3.theme.foo}
 \`;
 
 
 `;
 
-exports[`macros 2. macros: 2. macros 1`] = `
+exports[`Theme Macro Nesting: Nesting 1`] = `
 
-import theme from '../theme.macro';
-
-// Examples with props
-
-css\`\${props => theme.foo + props.bar}\`
-css\`\${function (props) { theme.foo + props.bar }}\`
-css\`\${({ bar }) => theme.foo + bar}\`
-css\`\${() => theme.foo}\`
-
-      ↓ ↓ ↓ ↓ ↓ ↓
-
-// Examples with props
-css\`
-  \${(props) => props.theme.foo + props.bar}
-\`;
-css\`
-  \${function (props) {
-    props.theme.foo + props.bar;
-  }}
-\`;
-css\`
-  \${(_props) => ({ bar }) => _props.theme.foo + bar}
-\`;
-css\`
-  \${(_props2) => () => _props2.theme.foo}
-\`;
-
-
-`;
-
-exports[`macros 3. macros: 3. macros 1`] = `
-
-import theme from '../theme.macro';
-
-// Examples with nesting
+import theme from '../../theme.macro';
 
 css\`\${props => props.foo && css\`\${theme.bar}\`}\`
 css\`\${props => props.foo ? css\`\${theme.bar}\` : css\`\${theme.baz}\`}\`
 css\`\${theme.foo ? css\`\${theme.bar}\` : css\`\${theme.baz}\`}\`
+css\`\${theme.foo ? \`\${theme.bar}\` : \`\${theme.baz}\`}\`
 
       ↓ ↓ ↓ ↓ ↓ ↓
 
-// Examples with nesting
 css\`
   \${(props) =>
     props.foo &&
@@ -105,6 +60,70 @@ css\`
       : css\`
           \${(_props6) => _props6.theme.baz}
         \`}
+\`;
+css\`
+  \${(_props7) =>
+    _props7.theme.foo ? \`\${_props7.theme.bar}\` : \`\${_props7.theme.baz}\`}
+\`;
+
+
+`;
+
+exports[`Theme Macro Props: Props 1`] = `
+
+import theme from '../../theme.macro';
+
+css\`\${props => theme.foo + props.bar}\`
+css\`\${function (props) { theme.foo + props.bar }}\`
+css\`\${({ bar }) => theme.foo + bar}\`
+css\`\${() => theme.foo}\`
+
+      ↓ ↓ ↓ ↓ ↓ ↓
+
+css\`
+  \${(props) => props.theme.foo + props.bar}
+\`;
+css\`
+  \${function (props) {
+    props.theme.foo + props.bar;
+  }}
+\`;
+css\`
+  \${(_props) => ({ bar }) => _props.theme.foo + bar}
+\`;
+css\`
+  \${(_props2) => () => _props2.theme.foo}
+\`;
+
+
+`;
+
+exports[`Theme Macro Simple: Simple 1`] = `
+
+import theme from '../../theme.macro';
+
+css\`\${theme.foo}\`
+css\`\${theme.foo.bar}\`
+css\`\${theme.foo[8] + 7}\`
+css\`\${bar(theme.foo)}\`
+css\`\${theme.foo + theme.bar}\`
+
+      ↓ ↓ ↓ ↓ ↓ ↓
+
+css\`
+  \${(_props) => _props.theme.foo}
+\`;
+css\`
+  \${(_props2) => _props2.theme.foo.bar}
+\`;
+css\`
+  \${(_props3) => _props3.theme.foo[8] + 7}
+\`;
+css\`
+  \${(_props4) => bar(_props4.theme.foo)}
+\`;
+css\`
+  \${(_props5) => _props5.theme.foo + _props5.theme.bar}
 \`;
 
 

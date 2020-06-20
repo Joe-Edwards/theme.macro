@@ -79,27 +79,28 @@ you should override the `DefaultTheme` declaration in your app to give you type-
 
 ## Caveats
 
-### Only applies within template interpolations
+### Transformation only works within tagged template literals
 
-The transformation is only applied within a template interpolation and will not work outside of that context:
+Any usage outside of a tagged template literal will produce an error at build time:
 
 ```javascript
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import theme from 'theme.macro';
 
-const color = theme.primaryColor; // MacroError: The theme macro at line 4 is not used within a template expression
+const color = theme.primaryColor;               // MacroError: The theme macro at line 4 is not used within a tagged template literal
+const border = `${theme.secondaryColor}`;       // MacroError: The theme macro at line 5 is not used within a tagged template literal
+const background = css`${theme.tertiaryColor}`; // OK
 
 export const Button = styled.button`
   color: ${color};
-  border: 1px solid ${theme.secondaryColor};
+  border: 1px solid ${border};
+  background-color: ${background};
 `;
 ```
 
-### Transformation is local to the nearest template interpolation
+### Transformation is local to the nearest tagged template literal
 
-The transformation only looks at the nearest template interpolation.
-
-As an example:
+Even if it is nested inside another tagged template literal:
 
 ```javascript
 import styled, { css } from 'styled-components';
@@ -107,8 +108,8 @@ import theme from 'theme.macro';
 
 export const Button = styled.button`
   ${props => props.primary
-    ? css`color: ${theme.primaryColor}`
-    : css`background: ${theme.secondaryColor}`};
+    ? `color: ${theme.primaryColor}`
+    : css`background-color: ${theme.secondaryColor}`};
 `;
 ```
 
@@ -119,22 +120,19 @@ import styled, { css } from 'styled-components';
 
 export const Button = styled.button`
   ${props => props.primary
-    ? css`color: ${(_props) => _props.theme.primaryColor}`
-    : css`background: ${(_props2) => _props2.theme.secondaryColor}`};
+    ? `color: ${props.theme.primaryColor}`
+    : css`background-color: ${(_props) => _props.theme.secondaryColor}`};
 `;
 ```
 
-In particular, this means that the inner templates _must_ also use the tagged `css` literal,
-if they are plain template strings then it will not work as expected.
+(Noting that plain template literals are ignored)
 
-### Nesting optimisation
+### Nested functions
 
-The transformation attempts to reuse any function already in the correct form.
-
-For example:
+The transformation attempts to reuse any function already in the correct form, for example:
 
 ```javascript
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import theme from 'theme.macro';
 
 export const Button = styled.button`
@@ -145,7 +143,7 @@ export const Button = styled.button`
 will be transformed to:
 
 ```javascript
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 export const Button = styled.button`
   color: ${props => props.primary ? props.theme.primaryColor : props.theme.secondaryColor}`;
@@ -155,7 +153,7 @@ export const Button = styled.button`
 However, this is not attempted for functions in a different form, for example using props destructuring:
 
 ```javascript
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import theme from 'theme.macro';
 
 export const Button = styled.button`
@@ -166,11 +164,11 @@ export const Button = styled.button`
 will be transformed as:
 
 ```javascript
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 export const Button = styled.button`
   color: ${(_props) => ({ primary }) => primary ? _props.theme.primaryColor : _props.theme.secondaryColor}`;
 `;
 ```
 
-(Note that this is only an optimisation concern - styled-components will flatten interpolations like this correctly).
+N.B. this is only an optimisation concern - styled-components will still flatten interpolations like this correctly.

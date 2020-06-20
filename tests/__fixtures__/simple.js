@@ -1,6 +1,4 @@
-import theme from '../theme.macro';
-
-// Simple examples
+import theme from '../../theme.macro';
 
 css`${theme.foo}`
 css`${theme.foo.bar}`

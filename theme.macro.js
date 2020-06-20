@@ -7,7 +7,7 @@ const findTemplateExpression = (path) => {
   if (!path.parentPath) {
     return null;
   }
-  if (path.parentPath.isTemplateLiteral()) {
+  if (path.parentPath.isTemplateLiteral() && path.parentPath.parentPath.isTaggedTemplateExpression()) {
     return path;
   }
   return findTemplateExpression(path.parentPath);
@@ -17,7 +17,7 @@ const handleReference = (path, { types: t }) => {
   const templateExpression = findTemplateExpression(path);
 
   if (!templateExpression) {
-    throw new MacroError(`The theme macro at line ${path.node.loc && path.node.loc.start.line} is not used within a template expression`);
+    throw new MacroError(`The theme macro at line ${path.node.loc && path.node.loc.start.line} is not used within a tagged template literal`);
   }
 
   let props;

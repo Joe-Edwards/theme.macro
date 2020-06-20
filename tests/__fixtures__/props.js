@@ -1,6 +1,4 @@
-import theme from '../theme.macro';
-
-// Examples with props
+import theme from '../../theme.macro';
 
 css`${props => theme.foo + props.bar}`
 css`${function (props) { theme.foo + props.bar }}`
