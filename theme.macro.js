@@ -11,7 +11,15 @@ const findTemplateExpression = (path) => {
     return path;
   }
   return findTemplateExpression(path.parentPath);
-}
+};
+
+// When reusing identifiers, we need to make sure they have not been shadowed where the macro is used
+// If they have, we can rename the identifier to avoid a clash
+const renameIfShadowed = (path, identifier) => {
+  if (path.scope.getBindingIdentifier(identifier.node.name) !== identifier.node) {
+    identifier.scope.rename(identifier.node.name);
+  }
+};
 
 const getThemeExpression = (path, templateExpression, t) => {
 
@@ -33,6 +41,8 @@ const getThemeExpression = (path, templateExpression, t) => {
 
     // Function with a simple identifer for props
     if (propsParam.isIdentifier()) {
+      renameIfShadowed(path, propsParam);
+
       // Theme accessed as `props.theme`
       return t.memberExpression(propsParam.node, t.identifier(THEME));
     }
@@ -48,7 +58,11 @@ const getThemeExpression = (path, templateExpression, t) => {
 
       // Theme is already destructured with an identifier - reuse it
       if (themeProperty) {
-        return themeProperty.get('value');
+        const themeIdentifier = themeProperty.get('value');
+        renameIfShadowed(path, themeIdentifier);
+
+        // Theme accessed as existing identifier
+        return themeIdentifier;
       }
 
       // Props has no rest element - safe to add a new identifier for theme

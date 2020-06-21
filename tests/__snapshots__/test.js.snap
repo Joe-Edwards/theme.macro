@@ -125,6 +125,25 @@ css\`
 
 `;
 
+exports[`Theme Macro Shadowing: Shadowing 1`] = `
+
+import theme from '../../theme.macro';
+
+css\`\${(props) => theme.foo + props.bar + ((props) => theme.baz)()}\`
+css\`\${({ theme: t }) => theme.foo + t.bar + ((t) => theme.baz)()}\`
+
+      ↓ ↓ ↓ ↓ ↓ ↓
+
+css\`
+  \${(_props) => _props.theme.foo + _props.bar + ((props) => _props.theme.baz)()}
+\`;
+css\`
+  \${({ theme: _t }) => _t.foo + _t.bar + ((t) => _t.baz)()}
+\`;
+
+
+`;
+
 exports[`Theme Macro Simple: Simple 1`] = `
 
 import theme from '../../theme.macro';
