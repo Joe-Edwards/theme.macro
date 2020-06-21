@@ -32,10 +32,10 @@ const Button = styled.button`
 
 ## Usage
 
-Install theme-macro:
+Install theme.macro:
 
 ```sh
-npm install theme-macro
+npm install theme.macro
 ```
 
 Add `babel-plugin-macros` to your babel config, for example:
